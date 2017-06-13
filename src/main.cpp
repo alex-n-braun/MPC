@@ -63,7 +63,10 @@ int main() {
   // MPC is initialized here!
   MPC mpc;
 
-  h.onMessage([&mpc](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+  double old_delta(0.);
+  double old_a(0.);
+
+  h.onMessage([&mpc, &old_delta, &old_a](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                      uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -116,13 +119,16 @@ int main() {
           * Both are in between [-1, 1].
           *
           */
-          Eigen::VectorXd state(6);
-          state << px, py, psi, v, cte, epsi;
+          Eigen::VectorXd state(8);
+          state << px, py, psi, v, cte, epsi, old_delta, old_a;
 
           auto vars = mpc.Solve(state, coeffs);
 
-          double steer_value(vars[0] / (deg2rad(25)*Lf));
-          double throttle_value(vars[1]);
+          old_delta=vars[0];
+          old_a=vars[1];
+
+          double steer_value(vars[2] / (deg2rad(25)*Lf));
+          double throttle_value(vars[3]);
 
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
@@ -137,7 +143,7 @@ int main() {
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Green line
 
-          for (int t(2); t<vars.size(); ++t) {
+          for (int t(4); t<vars.size(); ++t) {
             if (t%2 == 0) {
               mpc_x_vals.push_back(vars[t]);
             }

@@ -12,7 +12,7 @@ using namespace std;
 // Evaluate a polynomial.
 template <class T>
 T polyeval(Eigen::VectorXd coeffs, T x) {
-  T result = 0.0;
+  T result(0.0);
   for (int i(coeffs.size()-1); i >= 0; --i) {
     result = result * x + coeffs[i];
   }
@@ -22,7 +22,7 @@ T polyeval(Eigen::VectorXd coeffs, T x) {
 // Evaluate first derivative of a polynomial.
 template <class T>
 T polyeval_D1(Eigen::VectorXd coeffs, T x) {
-  T result = 0.0;
+  T result(0.0);
   for (int i(coeffs.size()-1); i > 0; --i) {
     result = result * x + double(i) * coeffs[i];
   }
