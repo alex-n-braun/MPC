@@ -53,4 +53,27 @@ Model Predictive Controller to keep a car on track
 
 ## The Model
 
-The model is basically the same as shown in the solution to the MPC quizz: $$\frac 1 2$$
+The model is basically the same as shown in the [project instructions](http://bsft.io/x/8uxfcm?uid=eb0ca4a3-b31f-4b1e-9a58-7b9f5289dcea&mid=80b300a4-ca7b-4144-9be1-a8ee2170650d). The state is given by position (x,y), speed (v), orientation (psi) and the errors: cross track error (cte) and orientation error (epsi). The actuators are given by steering angle (delta) and acceleration (a). The update quations for the state are given by
+
+1. x(t+dt) = x(t) + v(t) * cos(psi(t)) * dt,
+2. y(t+dt) = y(t) + v(t) * sin(psi(t)) * dt,
+3. v(t+dt) = v(t) + a(t) * dt,
+4. psi(t+dt) = psi(t) + v(t) * delta(t) / Lf * dt,
+5. cte(t+dt) = cte(t) + v(t) * sin(epsi(t)) * dt,
+6. epsi(t+dt) = epsi(t) - v(t) * delta(t) / Lf * dt.
+
+## Number of Time Steps & Timestep Length
+
+The time step length dt is taken from the [project instructions](http://bsft.io/x/8uxfcm?uid=eb0ca4a3-b31f-4b1e-9a58-7b9f5289dcea&mid=80b300a4-ca7b-4144-9be1-a8ee2170650d), dt=0.1, while the number of time steps has been set to N = 1.5 / dt = 15, corresponding to 1.5 seconds. 1.5s turned out to be sufficient for stable control (1s was not); reducing dt while keeping N*dt constant led to a huge increase in computation effort. 
+
+## Latency
+
+The simulation implements a delay of 100ms for the computation of new actuator values in order to simulate the dynamics of the actuators. This can be take into account by extending the model introducing state variables for the actuators. In this solution, I do so using state variables s_delta and s_a for the corresponding actuators delta and a. The update equations for this are implemented as
+
+7. s_delta(t+dt) = (1 - filter) * s_delta(t) + filter * delta(t),
+8. s_a(t+dt) = (1 - filter) * s_a(t) + filter * a(t).
+
+The variable filter is a number between 0 and 1. 0 means, that the state of the actuator does not react on the actuation, while 1 leads to an immedeate reaction. In order to reflect the delay in the update equation, one has to replace delta(t) by s_delta(t+dt) and a(t) by s_a(t+dt) in equations 4. and 6, whle s_delta(t) and s_a(t) are the state of the actuators from the last time step.
+
+
+
