@@ -73,7 +73,7 @@ The simulation implements a delay of 100ms for the computation of new actuator v
 7. s_delta(t+dt) = (1 - filter) * s_delta(t) + filter * delta(t),
 8. s_a(t+dt) = (1 - filter) * s_a(t) + filter * a(t).
 
-The variable filter is a number between 0 and 1. 0 means, that the state of the actuator does not react on the actuation, while 1 leads to an immedeate reaction. In order to reflect the delay in the update equation, one has to replace delta(t) by s_delta(t+dt) and a(t) by s_a(t+dt) in equations 4. and 6, whle s_delta(t) and s_a(t) are the state of the actuators from the last time step.
+The variable filter is a number between 0 and 1. 0 means, that the state of the actuator does not react on the actuation, while 1 leads to an immediate reaction. In order to reflect the delay in the update equations, one has to replace delta(t) by s_delta(t+dt) and a(t) by s_a(t+dt) in equations 4. and 6, while s_delta(t) and s_a(t) are the state of the actuators from the last time step.
 
 
 
